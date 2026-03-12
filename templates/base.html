@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="sv" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGuide - {% block title %}{% endblock %}</title>
+
+    <!-- Google Fonts: Oufit for headings, Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+
+    <!-- Accessibility Banner -->
+    <div class="a11y-banner" aria-label="Tillgänglighetsverktyg">
+        <div class="a11y-container">
+            <button id="toggle-contrast" class="btn-icon" aria-label="Växla högkontrast" title="Högkontrastläge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a10 10 0 0 0 0 20z"></path>
+                </svg>
+            </button>
+            <div class="font-size-controls">
+                <span class="sr-only">Ändra textstorlek</span>
+                <button id="font-decrease" class="btn-icon text-sm" aria-label="Minska textstorlek"
+                    title="Minska text">A-</button>
+                <button id="font-increase" class="btn-icon text-lg" aria-label="Öka textstorlek"
+                    title="Öka text">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <header class="app-header">
+        <div class="header-container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <span class="logo-icon">🚀</span>
+                <span class="logo-text">EduGuide</span>
+            </a>
+
+            {% if student %}
+            <div class="student-status">
+                <div class="xp-badge" title="Dina XP poäng">
+                    <span class="xp-star">⭐</span>
+                    <span class="xp-amount" id="header-xp">{{ student.total_xp }} XP</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <a href="{{ url_for('parent') }}" class="parent-link" aria-label="Föräldrapanel">👪</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Scripts -->
+    <script>
+        // Set up global environment for JS files
+        window.EduGuideConfig = {
+            currentStudentId: {{ student.id if student else 'null' }},
+        endpoints: {
+            listStudents: "{{ url_for('api_students') }}",
+                selectStudent: "{{ url_for('api_select_student') }}",
+                    createStudent: "{{ url_for('api_create_student') }}",
+                        uploadImage: "{{ url_for('api_upload_image') }}",
+                            submitText: "{{ url_for('api_submit_text') }}",
+                                reformulate: "{{ url_for('api_reformulate') }}",
+                                    hint: "{{ url_for('api_hint') }}",
+                                        submitAnswer: "{{ url_for('api_submit_answer') }}"
+        }
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/tts.js') }}" defer></script>
+    {% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>{% endblock
+    %}
+</body>
+
+</html>

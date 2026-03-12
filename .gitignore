@@ -1,0 +1,10 @@
+# EduGuide - Git Ignore
+__pycache__/
+.EduGuide_venv/
+.env
+google-credentials.json
+uploads/
+*.db
+*.pyc
+.vscode/
+.idea/

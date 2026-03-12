@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Föräldrapanel{% endblock %}
+{% block body_class %}page-parent{% endblock %}
+
+{% block content %}
+<div class="container parent-container">
+    
+    <!-- PIN Login Section -->
+    <div id="parent-login" class="card card-parent-login scale-in">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl">Föräldrapanel 👪</h1>
+            <p class="text-muted mt-2">Ange din PIN-kod för att se framsteg.</p>
+        </div>
+        
+        <form id="parent-login-form" class="parent-form">
+            <div class="pin-input-group">
+                <input type="password" id="parent-pin" class="input-large text-center" placeholder="****" maxlength="4" required autofocus>
+            </div>
+            <p id="login-error" class="text-error mt-2 hidden">Fel PIN-kod. Försök igen.</p>
+            <button type="submit" class="btn btn-primary btn-large w-full mt-4">Logga in</button>
+        </form>
+    </div>
+
+    <!-- Dashboard Content (Hidden profile initially) -->
+    <div id="parent-dashboard" class="hidden slide-up">
+        <header class="dashboard-header flex justify-between align-center mb-8">
+            <h1 class="text-3xl">Framstegsöversikt</h1>
+            <button id="btn-parent-logout" class="btn btn-outline btn-small">Logga ut</button>
+        </header>
+
+        <div id="student-reports" class="student-reports-grid">
+            <!-- Student cards will be injected here -->
+        </div>
+
+        <!-- Template for Student Report Card -->
+        <template id="tmpl-student-report">
+            <div class="card student-report-card">
+                <div class="report-header">
+                    <div class="student-info">
+                        <h2 class="student-name"></h2>
+                        <span class="persona-tag"></span>
+                    </div>
+                    <div class="level-badge-parent">Nivå <span class="student-level"></span></div>
+                </div>
+
+                <div class="report-stats-grid mt-6">
+                    <div class="stat-item">
+                        <span class="stat-value student-xp"></span>
+                        <span class="stat-label">Total XP</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value student-accuracy"></span>
+                        <span class="stat-label">Noggrannhet</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value student-time"></span>
+                        <span class="stat-label">Minuter övade</span>
+                    </div>
+                </div>
+
+                <div class="struggle-areas mt-8">
+                    <h3 class="text-lg mb-3">Behöver extra stöd med:</h3>
+                    <ul class="struggle-list">
+                        <!-- List items injected here -->
+                    </ul>
+                    <p class="no-struggles text-muted hidden">Inga specifika svårigheter hittade än. Bra jobbat!</p>
+                </div>
+                
+                <div class="subject-distribution mt-8">
+                    <h3 class="text-lg mb-3">Ämnesfördelning:</h3>
+                    <div class="subject-bars">
+                        <!-- Progress bars injected here -->
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/parent.js') }}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}

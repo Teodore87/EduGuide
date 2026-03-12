@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Hjälp med läxan{% endblock %}
+{% block body_class %}page-study persona-{{ student.persona }}{% endblock %}
+
+{% block content %}
+<div class="study-container">
+
+    <!-- Sidebar / Status -->
+    <aside class="study-sidebar">
+        <div class="student-profile card card-glass text-center">
+            <h2 class="text-xl">Hej {{ student.name }}!</h2>
+            <p class="text-muted text-sm mt-1">Du lyssnar på <strong>{% if student.persona == 'explorer' %}Upptäckaren 🔭{% elif student.persona == 'gamer' %}Gamern 🎮{% elif student.persona == 'coach' %}Coachen 📣{% else %}Zengurun 🧘‍♂️{% endif %}</strong></p>
+
+            <div class="level-progress mt-4">
+                <div class="level-info">
+                    <span class="level-badge" id="level-badge">Nivå {{ level.level }}</span>
+                    <span class="level-title" id="level-title">{{ level.title }}</span>
+                </div>
+                <div class="progress-bar-bg mt-2">
+                    <div class="progress-bar-fill" id="xp-progress" style="width: {{ level.progress }}%;"></div>
+                </div>
+                <div class="badges-grid mt-4"> <!-- Injekt badges från JS baserat på XP --> </div>
+                <p class="text-xs text-muted mt-1" id="xp-to-next">
+                    {{ level.xp_for_next - student.total_xp }} XP till nästa nivå!
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <section class="study-workspace">
+        
+        <!-- STEP 1: Upload / Input Zone (Visible initially) -->
+        <div id="input-zone" class="card card-glass upload-card scale-in">
+            <div class="upload-header text-center mb-4">
+                <h2 class="text-2xl">Vad behöver du hjälp med idag?</h2>
+                <p class="text-muted mt-2">Fota din läxa, eller skriv in frågan direkt.</p>
+            </div>
+
+            <div class="upload-methods">
+                <!-- Camera / Image Upload -->
+                <button type="button" class="btn btn-outline btn-large upload-btn" id="btn-camera" onclick="document.getElementById('image-upload').click()">
+                    <span class="icon text-3xl mb-2">📸</span>
+                    <span>Fota / Välj Bild</span>
+                </button>
+                <input type="file" id="image-upload" accept="image/*" capture="environment" class="sr-only">
+
+                <div class="divider">eller</div>
+
+                <!-- Text Input -->
+                <div class="text-input-group">
+                    <textarea id="manual-text" class="input-textarea" placeholder="Skriv in frågan här..." rows="4"></textarea>
+                    <button type="button" class="btn btn-primary mt-2 w-full" id="btn-submit-text">Skicka in text</button>
+                </div>
+            </div>
+
+            <div id="upload-loading" class="loading-spinner hidden mt-4 text-center">
+                <div class="spinner"></div>
+                <p class="mt-2 text-muted">Läser av bilden...</p>
+            </div>
+        </div>
+
+        <!-- STEP 2: Conversation / Scaffolding Zone (Hidden initially) -->
+        <div id="chat-zone" class="chat-container hidden slide-up">
+            
+            <div class="chat-header">
+                <span class="subject-badge" id="chat-subject">Ämne</span>
+                <button type="button" class="btn-icon btn-small text-muted" id="btn-new-question" title="Börja på ny fråga">
+                    🔄 Ny fråga
+                </button>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be injected here by JS -->
+            </div>
+
+            <!-- Answer Input Area -->
+            <div class="chat-input-area card card-glass mt-4">
+                <form id="answer-form" class="answer-form">
+                    <div class="input-group">
+                        <label for="student-answer" class="sr-only">Ditt svar:</label>
+                        <input type="text" id="student-answer" class="input-large" placeholder="Skriv ditt svar här..." autocomplete="off">
+                        
+                        <div class="form-actions mt-3 flex justify-between align-center">
+                            <button type="button" class="btn btn-text btn-hint" id="btn-get-hint" disabled>
+                                💡 Få en ledtråd
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btn-submit-answer" disabled>
+                                Svara 🚀
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+<!-- Template for Chat Messages (used by JS) -->
+<template id="tmpl-message">
+    <div class="message-wrapper">
+        <div class="message">
+            <div class="message-avatar"></div>
+            <div class="message-content">
+                <div class="message-text"></div>
+                <button type="button" class="btn-tts btn-icon" aria-label="Läs upp text" title="Läs upp">🔊</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Template for Reformulation Cards (used by JS) -->
+<template id="tmpl-reformulations">
+    <div class="reformulation-cards slide-up">
+        <div class="rcard simple" data-type="simple">
+            <h4>🔄 Enklare</h4>
+            <p class="rcard-text"></p>
+        </div>
+        <div class="rcard context" data-type="context">
+            <h4>🌍 Verkligheten</h4>
+            <p class="rcard-text"></p>
+        </div>
+        <div class="rcard steps" data-type="steps">
+            <h4>🪜 Steg-för-steg</h4>
+            <p class="rcard-text"></p>
+        </div>
+    </div>
+</template>
+
+<!-- Break Overlay -->
+<div id="break-overlay" class="modal-overlay hidden">
+    <div class="modal card card-glass text-center scale-in">
+        <h2 class="text-2xl mb-2">Pausdags? 🌸</h2>
+        <p class="text-muted" id="break-message">Du har jobbat hårt! Kanske ta en liten paus?</p>
+        <div class="modal-actions mt-6">
+            <button class="btn btn-outline" onclick="document.getElementById('break-overlay').classList.add('hidden')">Jag kämpar på!</button>
+            <button class="btn btn-primary" id="btn-take-break">Bra idé, jag tar rast</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

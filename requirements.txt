@@ -1,0 +1,8 @@
+# EduGuide - Dependencies
+Flask==3.1.0
+Flask-SQLAlchemy==3.1.1
+python-dotenv==1.1.0
+google-cloud-vision==3.9.0
+google-generativeai==0.8.4
+Pillow==11.1.0
+Werkzeug==3.1.3

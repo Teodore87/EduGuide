@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Vem är du idag?{% endblock %}
+{% block body_class %}page-index bg-mesh{% endblock %}
+
+{% block content %}
+<div class="container hero-container">
+    <div class="hero-content text-center">
+        <h1 class="hero-title">Välkommen till EduGuide</h1>
+        <p class="hero-subtitle">Vem vill du vara idag?</p>
+
+        <!-- Existing Students Section -->
+        <div id="existing-students-section" class="existing-students hidden mt-3">
+            <p class="section-label">Fortsätt där du slutade:</p>
+            <div id="student-list" class="student-list">
+                <!-- Students will be injected here by app.js -->
+            </div>
+            <div class="divider mt-2 mb-2"><span>eller</span></div>
+        </div>
+
+        <form id="student-entry-form" class="student-form">
+            <div class="input-group">
+                <label for="student-name" class="sr-only">Vad heter du?</label>
+                <input type="text" id="student-name" class="input-large" placeholder="Vad heter du?" required>
+            </div>
+
+            <p class="section-label">Välj din guide-stil:</p>
+            
+            <div class="persona-grid" role="radiogroup" aria-label="Välj persona">
+                
+                <!-- Explorer -->
+                <label class="persona-card" for="persona-explorer">
+                    <input type="radio" name="persona" id="persona-explorer" value="explorer" class="sr-only" checked>
+                    <div class="persona-content">
+                        <div class="persona-icon explorer-icon">🔭</div>
+                        <h3 class="persona-name">Upptäckaren</h3>
+                        <p class="persona-desc">Förklarar genom äventyr, rymden och natur.</p>
+                    </div>
+                </label>
+
+                <!-- Gamer -->
+                <label class="persona-card" for="persona-gamer">
+                    <input type="radio" name="persona" id="persona-gamer" value="gamer" class="sr-only">
+                    <div class="persona-content">
+                        <div class="persona-icon gamer-icon">🎮</div>
+                        <h3 class="persona-name">Gamern</h3>
+                        <p class="persona-desc">Hjälper dig "levla upp" och ser utmaningar som bossar.</p>
+                    </div>
+                </label>
+
+                <!-- Coach -->
+                <label class="persona-card" for="persona-coach">
+                    <input type="radio" name="persona" id="persona-coach" value="coach" class="sr-only">
+                    <div class="persona-content">
+                        <div class="persona-icon coach-icon">📣</div>
+                        <h3 class="persona-name">Coachen</h3>
+                        <p class="persona-desc">Hög energi! Peppar dig och bryter ner allt i övningar.</p>
+                    </div>
+                </label>
+
+                <!-- Zen -->
+                <label class="persona-card" for="persona-zen">
+                    <input type="radio" name="persona" id="persona-zen" value="zen" class="sr-only">
+                    <div class="persona-content">
+                        <div class="persona-icon zen-icon">🧘‍♂️</div>
+                        <h3 class="persona-name">Zengurun</h3>
+                        <p class="persona-desc">Lugn och metodisk. Inga konstigheter, ingen stress.</p>
+                    </div>
+                </label>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large btn-glow mt-2">
+                Börja Nu 🚀
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Template for student list items -->
+<template id="tmpl-student-item">
+    <button class="student-item-btn" data-id="">
+        <div class="student-item-icon"></div>
+        <div class="student-item-info">
+            <div class="student-item-name"></div>
+            <div class="student-item-meta"></div>
+        </div>
+    </button>
+</template>
+{% endblock %}

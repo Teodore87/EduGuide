@@ -1,0 +1,29 @@
+# MISSION: Create "EduGuide"
+[cite_start]Build a pedagogical web application designed for students (ages 10-15) to help with homework through scaffolding, ensuring they never receive direct answers.
+
+# CORE STACK & STRUCTURE
+- [cite_start]Backend: Python (Flask), SQLAlchemy, python-dotenv.
+- [cite_start]Frontend: HTML5, CSS3 (Custom Properties for accessibility), Vanilla JS[cite: 11, 14].
+- [cite_start]APIs: Google Vision (OCR) for text extraction and Google Gemini for reasoning/scaffolding[cite: 3, 13].
+- [cite_start]Database: SQLite (local for prototype) with models for Student, Session, Question, and ParentAccess.
+
+# UI/UX GUIDELINES (STRESS-FREE)
+- [cite_start]Palette: Soft purples, teals, and warm whites (Avoid harsh reds)[cite: 14].
+- Language: UI must be in Swedish; [cite_start]AI internal instructions in English[cite: 9, 17].
+- [cite_start]Accessibility: Include font size slider, high-contrast toggle, and Text-to-Speech (TTS) using Web Speech API[cite: 12, 16].
+
+# LOGIC FLOW
+1. [cite_start]INITIALIZATION: Setup `app.py`, `config.py`, and `models.py`.
+2. STUDENT MODE:
+   - [cite_start]Select Persona (Simplified placeholders: Explorer, Gamer, Coach, Zen)[cite: 15, 17].
+   - [cite_start]Image Upload: Use a camera/file input to send images to an OCR service[cite: 11, 15].
+   - [cite_start]Scaffolding Engine: Generate 3 versions of the extracted question (Simple, Context-based, Step-by-step)[cite: 17].
+   - [cite_start]Validation: Check student answers without revealing the solution[cite: 17].
+3. [cite_start]REWARDS: Implement an XP system (+10 for first try, +5 for persistence) with no negative feedback[cite: 13, 17].
+4. [cite_start]PARENT DASHBOARD: Create a PIN-protected view showing progress stats and "struggle areas"[cite: 6, 17].
+
+# EXECUTION STEPS
+1. [cite_start]Generate the file structure defined in the implementation plan[cite: 10].
+2. [cite_start]Create `requirements.txt` and `config.py` with placeholders for API keys.
+3. [cite_start]Implement the core Flask routes and SQLAlchemy models.
+4. [cite_start]Build the responsive 'Study' interface with a chat-like flow[cite: 14, 15].

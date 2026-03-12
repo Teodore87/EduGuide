@@ -1,0 +1,180 @@
+# EduGuide - The Stress-Free Homework Partner
+
+A pedagogical web app that helps children (ages 10-15) understand their homework through scaffolding, without revealing answers. Students can photograph homework, get questions reformulated, and earn XP — all in a stress-free, accessible interface.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **API Keys Required**: This app uses **Google Vision API** (OCR) and **Google Gemini API** (reasoning). You'll need to provide API keys before Phase 3. Are you set up with Google Cloud credentials, or would you prefer mock/simulated API responses for initial development?
+
+> [!IMPORTANT]
+> **Scope for v1**: This plan builds a full working prototype. The **Parent Dashboard** will show progress data but uses a simple PIN-based access (not full authentication). The **Teacher/School integration** mentioned in the draft is deferred to a future version. Does this scope sound right?
+
+> [!IMPORTANT]
+> **Language**: The UI copy in the spec is English, but the first draft is in Swedish and mentions your daughter. Should the app UI be in **Swedish**, **English**, or **bilingual**?
+
+---
+
+## Proposed Changes
+
+### Project Structure
+
+```
+EduGuide/
+├── app.py                  # Flask app entry point
+├── config.py               # Configuration (API keys, DB settings)
+├── models.py               # SQLAlchemy database models
+├── requirements.txt        # Python dependencies
+├── static/
+│   ├── css/
+│   │   └── style.css       # Full design system
+│   ├── js/
+│   │   ├── app.js          # Main app logic
+│   │   ├── camera.js       # Camera/image upload handling
+│   │   ├── tts.js          # Text-to-Speech module
+│   │   └── rewards.js      # XP animations & tracking
+│   └── images/
+│       └── (persona icons, badges, etc.)
+├── templates/
+│   ├── base.html           # Base layout with nav & accessibility controls
+│   ├── index.html          # Landing / persona selection
+│   ├── study.html          # Main homework helper (chat-style)
+│   └── parent.html         # Parent dashboard
+└── services/
+    ├── __init__.py
+    ├── ocr_service.py      # Google Vision OCR wrapper
+    ├── ai_service.py       # Gemini scaffolding & reasoning
+    └── xp_service.py       # XP calculation & rewards logic
+```
+
+---
+
+### Phase 1: Foundation
+
+#### [NEW] [requirements.txt](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/requirements.txt)
+- Flask, Flask-SQLAlchemy, python-dotenv, google-cloud-vision, google-generativeai, Pillow
+
+#### [NEW] [config.py](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/config.py)
+- Load API keys from `.env` file
+- Database URI, secret key, debug flag
+
+#### [NEW] [app.py](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/app.py)
+- Flask app factory
+- Route registration for: `/` (landing), `/study` (main helper), `/parent` (dashboard)
+- API endpoints: `/api/upload-image`, `/api/ask`, `/api/submit-answer`, `/api/xp`, `/api/progress`
+
+#### [NEW] [models.py](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/models.py)
+- **Student**: id, name, persona, total_xp, created_at
+- **Session**: id, student_id, subject, started_at, ended_at
+- **Question**: id, session_id, original_text, image_path, reformulations (JSON), subject, hint_count, attempts, is_correct, xp_earned
+- **ParentAccess**: id, student_id, pin_hash
+
+---
+
+### Phase 2: Student Mode UI
+
+#### [NEW] [style.css](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/static/css/style.css)
+- Anti-stress color palette: soft purples, teals, warm whites — no harsh reds
+- Large base font (18px), clear hierarchy
+- High-contrast mode toggle (CSS custom properties)
+- Smooth micro-animations (XP popups, button feedback, card transitions)
+- Glassmorphism cards, rounded corners, soft shadows
+- Mobile-first responsive design
+- Persona-specific color themes (Explorer=cosmic blue, Gamer=neon green, Coach=energetic orange, Zen=calm sage)
+
+#### [NEW] [base.html](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/templates/base.html)
+- Accessible base layout with semantic HTML5
+- Accessibility toolbar: font size slider, high contrast toggle, TTS toggle
+- XP bar in header (persistent across pages)
+
+#### [NEW] [index.html](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/templates/index.html)
+- Welcome screen with student name input
+- 4 persona cards with icons, descriptions, and hover animations
+- "Start Learning" button → navigates to study page
+
+#### [NEW] [study.html](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/templates/study.html)
+- **Image upload zone**: Camera capture button + drag-and-drop file area
+- **Chat-style conversation area**: Shows extracted text, reformulated questions, hints, validation feedback
+- **Answer input**: Text field with submit button
+- **Encouraging feedback**: Animated toasts for correct answers, gentle nudges for incorrect
+- **Break prompt**: After 3 wrong attempts, show calming "Let's try a different approach!" message
+
+#### [NEW] [app.js](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/static/js/app.js)
+- Persona selection & session management
+- Chat message rendering
+- API communication (upload, ask, submit)
+
+#### [NEW] [camera.js](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/static/js/camera.js)
+- Image capture via `<input type="file" capture="camera">`
+- Image preview before upload
+- Drag-and-drop support
+
+#### [NEW] [rewards.js](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/static/js/rewards.js)
+- XP popup animations (confetti-style particles)
+- Level-up celebrations
+- Progress bar updates
+
+#### [NEW] [tts.js](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/static/js/tts.js)
+- Web Speech API wrapper
+- Read-aloud button for each message
+- Voice selection (if multiple available)
+
+---
+
+### Phase 3: Backend Services
+
+#### [NEW] [ocr_service.py](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/services/ocr_service.py)
+- Accept uploaded image, send to Google Vision API
+- Return extracted text + detected language
+- Fallback: if Vision API unavailable, return placeholder text for testing
+
+#### [NEW] [ai_service.py](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/services/ai_service.py)
+- **Subject detection**: Identify if question is Math, Science, Language, etc.
+- **Reformulate**: Generate 3 versions of the question (Simple, Context-based, Step-by-step)
+- **Hint generation**: Progressive hints based on persona style
+- **Answer validation**: Compare student answer against expected answer without revealing it
+- All prompts persona-aware (Explorer uses space analogies, Gamer uses game terms, etc.)
+
+#### [NEW] [xp_service.py](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/services/xp_service.py)
+- Calculate XP: +10 first try, +5 with hints
+- Track streaks, total XP
+- Growth mindset messages (never negative)
+
+---
+
+### Phase 4: Parent Dashboard
+
+#### [NEW] [parent.html](file:///e:/EgnaStudier/1.%20Egna%20studier%20-%20välsorterad/Antigravity_IDE/EduGuide/templates/parent.html)
+- PIN entry screen for access
+- Stats overview: total sessions, XP earned, time spent
+- Bar chart: subjects studied (using Chart.js via CDN)
+- "Struggle areas" list: concepts where student needed most hints
+- Session history timeline
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+Since this is a new project, I'll add a lightweight test file:
+
+#### [NEW] `tests/test_app.py`
+- **Test persona selection**: POST to create student → verify DB entry
+- **Test XP calculation**: Verify +10 for first try, +5 with hints, no negatives
+- **Test API routes respond**: Verify `/api/upload-image`, `/api/ask`, `/api/submit-answer` return correct status codes
+
+**Run command**: `python -m pytest tests/ -v` from the `EduGuide/` directory.
+
+### Browser Verification
+- **Persona Selection**: Open `http://localhost:5000`, verify 4 persona cards render, click one → navigate to study page
+- **Image Upload**: On study page, upload a test image → verify extracted text appears in chat
+- **Scaffolding Flow**: Ask for help → verify 3 reformulated questions appear → submit answer → verify XP feedback
+- **Accessibility**: Toggle high contrast → verify color scheme changes. Click TTS → verify text is read aloud
+- **Parent Dashboard**: Navigate to `/parent` → enter PIN → verify progress charts render
+- **Mobile Responsive**: Resize browser to 375px width → verify layout adapts cleanly
+
+### Manual Verification (User)
+1. **Real homework test**: Upload an actual photo of homework and verify OCR + reformulation quality
+2. **Anti-stress UX**: Submit 3 wrong answers and verify the break suggestion appears
+3. **TTS quality**: Listen to readback on different text types (math vs language)
