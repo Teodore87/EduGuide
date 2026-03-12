@@ -9,3 +9,4 @@ uploads/
 .vscode/
 .idea/
 supabase.txt
+error_log*

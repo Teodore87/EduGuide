@@ -22,6 +22,7 @@ class Config:
     database_url = os.getenv("DATABASE_URL")
     
     if database_url:
+        database_url = database_url.strip().rstrip(".")
         # SQLAlchemy 1.4+ requires 'postgresql://' instead of 'postgres://'
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
