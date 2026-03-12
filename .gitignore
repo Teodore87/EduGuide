@@ -8,3 +8,4 @@ uploads/
 *.pyc
 .vscode/
 .idea/
+supabase.txt
