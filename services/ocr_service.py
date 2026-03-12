@@ -9,33 +9,40 @@ import json
 def extract_text_from_image(image_path: str) -> dict:
     """
     Extract text from an image using Google Vision API.
-
-    Args:
-        image_path: Path to the uploaded image file.
-
-    Returns:
-        dict with keys:
-            - 'text': The extracted text string
-            - 'language': Detected language code (e.g. 'sv', 'en')
-            - 'success': Boolean indicating if extraction worked
-            - 'source': 'vision_api' or 'mock'
     """
-    # Check if Google Vision credentials are configured
+    # Check if Google Vision credentials are configured as a file path
     credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
+    # Or as a JSON string (common for cloud deployments like Render)
+    credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON", "")
 
-    if credentials_path and os.path.exists(credentials_path):
-        return _extract_with_vision_api(image_path)
+    if (credentials_path and os.path.exists(credentials_path)) or credentials_json:
+        return _extract_with_vision_api(image_path, credentials_json)
     else:
-        raise FileNotFoundError(f"Google Vision credentials not found at {credentials_path}")
+        # If no credentials, we can't do real OCR
+        return {
+            "text": "DEBUG: OCR skulle skett här, men inga referenser hittades.",
+            "language": "sv",
+            "success": False,
+            "source": "mock",
+            "error": "Google Vision credentials not configured."
+        }
 
 
-def _extract_with_vision_api(image_path: str) -> dict:
+def _extract_with_vision_api(image_path: str, credentials_json: str = "") -> dict:
     """Use Google Cloud Vision API for real OCR."""
     try:
         from google.cloud import vision
+        from google.oauth2 import service_account
 
         # Create Vision API client
-        client = vision.ImageAnnotatorClient()
+        if credentials_json:
+            # Load from JSON string
+            info = json.loads(credentials_json)
+            credentials = service_account.Credentials.from_service_account_info(info)
+            client = vision.ImageAnnotatorClient(credentials=credentials)
+        else:
+            # Load from file (default behavior using GOOGLE_APPLICATION_CREDENTIALS env var)
+            client = vision.ImageAnnotatorClient()
 
         # Read the image file
         with open(image_path, "rb") as image_file:
